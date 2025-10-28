@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+    <a href="{{ url_for('index') }}" class="btn btn-sm btn-outline-secondary mb-3">‹ Voltar para a Lista</a>
+    <h1>Detalhes de: {{ produto.nome }}</h1>
+    <p class="lead">{{ produto.categoria or '' }} - {{ produto.descricao or '' }}</p>
+    <hr>
+    <h3>Ativos em Estoque ({{ produto.quantidade_em_estoque }})</h3>
+    <div class="table-responsive">
+        <table class="table table-sm table-striped">
+             <thead class="table-dark">
+                <tr><th>PAT</th><th>Status</th><th class="text-end">Ações</th></tr>
+            </thead>
+            <tbody>
+                {% for ativo in ativos if ativo.status == 'Em Estoque' %}
+                <tr>
+                    <td>{{ ativo.pat }}</td>
+                    <td><span class="badge bg-success">{{ ativo.status }}</span></td>
+                    <td class="text-end">
+                        <a href="{{ url_for('editar_ativo', ativo_id=ativo.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="3" class="text-center">Nenhum ativo em estoque.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <h3 class="mt-4">Ativos em Campo</h3>
+     <div class="table-responsive">
+        <table class="table table-sm table-striped">
+             <thead class="table-dark">
+                <tr><th>PAT</th><th>Status</th><th>Retirada #</th><th>Responsável</th><th class="text-end">Ações</th></tr>
+            </thead>
+            <tbody>
+                {% for ativo in ativos if ativo.status == 'Em Campo' %}
+                <tr>
+                    <td>{{ ativo.pat }}</td>
+                    <td><span class="badge bg-warning text-dark">{{ ativo.status }}</span></td>
+                    <td><a href="{{ url_for('historico_retiradas') }}">{{ ativo.retirada_id }}</a></td>
+                    <td>{{ ativo.retirada.responsavel }}</td>
+                    <td class="text-end">
+                        <a href="{{ url_for('editar_ativo', ativo_id=ativo.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" class="text-center">Nenhum ativo em campo.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

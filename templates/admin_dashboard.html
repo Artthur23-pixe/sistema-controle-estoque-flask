@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Painel de Administração</h1>
+    <p class="lead">Visão geral da atividade dos utilizadores no sistema.</p>
+    <hr>
+    
+    <h2>Atividade por Utilizador</h2>
+    <div class="list-group">
+        {% for user in users %}
+            <a href="{{ url_for('user_activity_log', user_id=user.id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                {{ user.username }}
+                <span class="badge bg-{{ 'primary' if user.role == 'admin' else 'secondary' }} rounded-pill">{{ user.role }}</span>
+            </a>
+        {% endfor %}
+    </div>
+{% endblock %}

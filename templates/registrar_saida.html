@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Registrar Saída para: <span class="text-primary">{{ produto.nome }}</span></h2>
+<p class="lead">Quantidade atual em estoque: <strong>{{ produto.quantidade }}</strong></p>
+<hr>
+<form method="post">
+<div class="mb-3">
+<label for="quantidade" class="form-label">Quantidade a Retirar</label>
+<input type="number" class="form-control" id="quantidade" name="quantidade" min="1" max="{{ produto.quantidade }}" required>
+</div>
+<div class="mb-3">
+<label for="responsavel" class="form-label">Responsável pela Retirada</label>
+<input type="text" class="form-control" id="responsavel" name="responsavel" required>
+</div>
+<div class="mb-3">
+<label for="destino" class="form-label">Destino do Material</label>
+<input type="text" class="form-control" id="destino" name="destino" required>
+</div>
+<button type="submit" class="btn btn-danger">Confirmar Saída</button>
+<a href="{{ url_for('index') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

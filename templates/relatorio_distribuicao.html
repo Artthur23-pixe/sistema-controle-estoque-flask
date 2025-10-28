@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório de Distribuições</title>
+    <style>
+        @page { size: A4 landscape; margin: 1.5cm; }
+        body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 10pt; color: #333; }
+        .header img { width: 100%; height: auto; }
+        h1 { text-align: center; margin-top: 20px; font-size: 16pt; color: #111; }
+        .report-info { font-size: 8pt; color: #555; text-align: center; margin-bottom: 20px; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; padding: 5px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; font-size: 9pt; text-transform: uppercase; }
+        .footer { position: fixed; bottom: -1cm; left: 0; right: 0; text-align: center; font-size: 8pt; color: #888; }
+        .page-number:after { content: counter(page); }
+    </style>
+</head>
+<body>
+    <div class="footer">
+        Página <span class="page-number"></span>
+    </div>
+
+    {% if header_image %}
+    <div class="header">
+        <img src="data:image/png;base64,{{ header_image }}" alt="Cabeçalho da Novetech">
+    </div>
+    {% endif %}
+
+    <h1>Relatório de Distribuições Finais</h1>
+
+    <div class="report-info">
+        Relatório emitido em: {{ data_emissao.strftime('%d/%m/%Y %H:%M:%S') }}.
+        {% if search_terms %}
+            <strong>Filtros aplicados:</strong>
+            {% for key, value in search_terms.items() %}
+                {{ key.replace('_', ' ').title() }}: {{ value }};
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Data/Hora</th>
+                <th>Equipamento</th>
+                <th>Qtd.</th>
+                <th>Destino Final</th>
+                <th>Responsável</th>
+                <th>Ref. Retirada</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dist in distribuicoes %}
+            <tr>
+                <td>{{ dist.data_hora.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td>{{ dist.produto_nome }}</td>
+                <td>{{ dist.quantidade }}</td>
+                <td>{{ dist.unidade_saude }}</td>
+                <td>{{ dist.retirada.responsavel }}</td>
+                <td>#{{ dist.retirada.id }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align: center;">Nenhuma distribuição encontrada para os filtros selecionados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+    <a href="{{ url_for('detalhes_produto', produto_id=ativo.produto_id) }}" class="btn btn-sm btn-outline-secondary mb-3">‹ Voltar para os Detalhes</a>
+    <h1>Editar Ativo: {{ ativo.pat }}</h1>
+    <p class="lead">Produto: {{ ativo.produto.nome }}</p>
+    <hr>
+    <form method="post">
+        <div class="mb-3">
+            <label for="pat" class="form-label">PAT</label>
+            <input type="text" class="form-control" id="pat" name="pat" value="{{ ativo.pat }}" required>
+        </div>
+        <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" name="status">
+                <option value="Em Estoque" {{ 'selected' if ativo.status == 'Em Estoque' }}>Em Estoque</option>
+                <option value="Em Campo" {{ 'selected' if ativo.status == 'Em Campo' }}>Em Campo</option>
+                <option value="Baixado" {{ 'selected' if ativo.status == 'Baixado' }}>Baixado (Fora de uso)</option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="localizacao_final" class="form-label">Localização Final (se aplicável)</label>
+            <input type="text" class="form-control" id="localizacao_final" name="localizacao_final" value="{{ ativo.localizacao_final or '' }}">
+        </div>
+        <button type="submit" class="btn btn-success">Salvar Alterações</button>
+    </form>
+{% endblock %}

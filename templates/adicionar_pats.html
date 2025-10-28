@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Adicionar PATs para: {{ produto.nome }}</h1>
+    <p class="lead">Por favor, informe os {{ quantidade }} identificadores únicos para os novos ativos.</p>
+    <hr>
+    <form method="post">
+        <div class="row g-3">
+            {% for i in range(quantidade) %}
+            <div class="col-md-4">
+                <div class="form-floating">
+                    <input type="text" class="form-control" name="pat[]" id="pat{{i}}" placeholder="PAT #{{ i + 1 }}" required>
+                    <label for="pat{{i}}">PAT #{{ i + 1 }}</label>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <hr>
+        <button type="submit" class="btn btn-primary btn-lg">Salvar Ativos</button>
+        <a href="{{ url_for('index') }}" class="btn btn-secondary btn-lg">Cancelar</a>
+    </form>
+{% endblock %}

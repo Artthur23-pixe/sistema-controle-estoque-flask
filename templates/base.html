@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Estoque - Novetech</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Titillium+Web:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        .navbar-brand-custom .logo { font-family: 'Titillium Web', sans-serif; font-weight: 700; font-size: 1.8rem; color: #ffffff; text-decoration: none; }
+        .navbar-brand-custom .subtitle { font-family: 'Roboto Mono', monospace; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: #adb5bd; }
+        .main-content { min-height: 80vh; }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <header class="p-3 mb-3 border-bottom bg-dark">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+                <a href="{{ url_for('index') }}" class="navbar-brand-custom d-flex align-items-center mb-2 mb-lg-0 text-decoration-none me-lg-auto"><div><div class="logo">NOVETECH</div><div class="subtitle">Controle de Estoque</div></div></a>
+                
+                <ul class="nav col-12 col-lg-auto justify-content-center mb-md-0 me-lg-3">
+                    <li><a href="{{ url_for('index') }}" class="nav-link px-2 link-light">Ver Estoque</a></li>
+                    <li><a href="{{ url_for('adicionar_produto') }}" class="nav-link px-2 link-light">Adicionar</a></li>
+                    <li><a href="{{ url_for('retirada_equipamento') }}" class="nav-link px-2 link-light">Retirada</a></li>
+                    <li><a href="{{ url_for('distribuicao_equipamento') }}" class="nav-link px-2 link-light">Distribuição</a></li>
+                    <li><a href="{{ url_for('devolucao_equipamento') }}" class="nav-link px-2 link-light">Devolução</a></li>
+                    <li><a href="{{ url_for('solicitacao_compra') }}" class="nav-link px-2 link-light">Solicitar Compra</a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle link-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Histórico</a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('visualizar_historico_retiradas') }}">Retiradas</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('visualizar_historico_distribuicao') }}">Distribuições</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('visualizar_historico_devolucoes') }}">Devoluções</a></li>
+                        </ul>
+                    </li>
+                    <!-- NOVO LINK PARA ADMINS -->
+                    {% if current_user.role == 'admin' %}
+                    <li><a href="{{ url_for('admin_dashboard') }}" class="nav-link px-2 link-warning">Painel Admin</a></li>
+                    {% endif %}
+                </ul>
+
+                <div class="dropdown text-end">
+                    <a href="#" class="d-block link-light text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <strong>Olá, {{ current_user.username.split()[0] }}</strong>
+                    </a>
+                    <ul class="dropdown-menu text-small">
+                        <li><a class="dropdown-item" href="{{ url_for('logout') }}">Sair</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="container main-content">
+        <div class="bg-body-tertiary p-5 rounded">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+    <footer class="footer mt-auto py-3 bg-dark">
+        <div class="container text-center">
+            <span class="text-muted">© {{ current_year }} Novetech - Soluções Tecnológicas. Todos os direitos reservados.</span>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // SCRIPT PARA RETIRADA/DEVOLUÇÃO/SOLICITAÇÃO
+        function addItem() {
+            const template = document.querySelector('#item-template');
+            if (template) {
+                const container = document.querySelector('#items-container');
+                const clone = template.content.cloneNode(true);
+                container.appendChild(clone);
+            }
+        }
+        function removeItem(button) {
+            const itemRow = button.closest('.item-row');
+            if (document.querySelectorAll('.item-row').length > 1) {
+                itemRow.remove();
+            }
+        }
+        
+        // SCRIPT PARA A PÁGINA DE DISTRIBUIÇÃO
+        document.addEventListener('DOMContentLoaded', function() {
+            const retiradaSelect = document.getElementById('retirada_id');
+            if (retiradaSelect) {
+                retiradaSelect.addEventListener('change', function() {
+                    const retiradaId = this.value;
+                    const detailsSection = document.getElementById('details-section');
+                    if (!retiradaId) {
+                        detailsSection.classList.add('d-none');
+                        return;
+                    }
+                    fetch(`/get_itens_retirada/${retiradaId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            window.retiradaItens = data;
+                            const list = document.getElementById('retirada-items-list');
+                            list.innerHTML = '';
+                            data.forEach(item => {
+                                const li = document.createElement('li');
+                                li.className = 'list-group-item bg-dark border-secondary';
+                                li.textContent = `${item.quantidade}x ${item.produto_nome}`;
+                                list.appendChild(li);
+                            });
+                            document.getElementById('destinos-container').innerHTML = '';
+                            document.getElementById('devolucao-container').innerHTML = '';
+                            detailsSection.classList.remove('d-none');
+                        });
+                });
+            }
+        });
+        function createDistributionRow(type, containerId) {
+            const container = document.getElementById(containerId);
+            const row = document.createElement('div');
+            row.className = 'row mb-2 align-items-end';
+            const nameField = type === 'destino' ? 
+                `<input type="text" class="form-control" name="unidade_saude[]" placeholder="Unidade de Saúde" required>` : '';
+            let productOptions = window.retiradaItens.map(item => `<option value="${item.produto_nome}">${item.produto_nome}</option>`).join('');
+            row.innerHTML = `
+                ${type === 'destino' ? `<div class="col-md-4">${nameField}</div>` : ''}
+                <div class="col-md-${type === 'destino' ? '4' : '8'}">
+                    <select class="form-select" name="produto_${type === 'destino' ? 'distribuido' : 'devolvido'}[]" required>
+                        <option value="" disabled selected>Selecione o produto</option>
+                        ${productOptions}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" class="form-control" name="quantidade_${type === 'destino' ? 'distribuida' : 'devolvida'}[]" placeholder="Qtd." min="1" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-sm btn-outline-danger w-100" onclick="this.parentElement.parentElement.remove()">Remover</button>
+                </div>
+            `;
+            container.appendChild(row);
+        }
+        function addDestinoRow() { createDistributionRow('destino', 'destinos-container'); }
+        function addDevolucaoRow() { createDistributionRow('devolucao', 'devolucao-container'); }
+    </script>
+</body>
+</html>

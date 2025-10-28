@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Adicionar / Atualizar Produto</h1>
+<hr>
+<form method="post">
+<div class="mb-3">
+<label for="nome" class="form-label">Nome do Produto</label>
+<input type="text" class="form-control" id="nome" name="nome" required>
+</div>
+<div class="row">
+<div class="col-md-8 mb-3">
+<!-- NOVO CAMPO -->
+<label for="categoria" class="form-label">Categoria (ex: Monitores, Cabos)</label>
+<input type="text" class="form-control" id="categoria" name="categoria">
+</div>
+<div class="col-md-4 mb-3">
+<label for="quantidade" class="form-label">Quantidade</label>
+<input type="number" class="form-control" id="quantidade" name="quantidade" min="1" required>
+</div>
+</div>
+<div class="mb-3">
+<label for="descricao" class="form-label">Descrição (opcional)</label>
+<input type="text" class="form-control" id="descricao" name="descricao">
+</div>
+<button type="submit" class="btn btn-success">Salvar Produto</button>
+<a href="{{ url_for('index') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}
